@@ -1,16 +1,23 @@
 import {DatabaseConnection} from '../database/DatabaseConnection'
 
-const table = "imovel"
+const table = "locatario"
 const db = DatabaseConnection.getConnection()
 
-export default class ImovelService {
+export default class LocatarioService {
 
   static addData(param) {
     return new Promise((resolve, reject) => db.transaction(
       tx => {
-        tx.executeSql(`insert into ${table} (endereco, locado, foto, tipo, valorAluguel, valorCondominio, numQuarto, numBanheiro)
+        tx.executeSql(`insert into ${table} (nome,
+                                             cpf,
+                                             data_nascimento,
+                                             renda_mensal,
+                                             vencimento_aluguel,
+                                             inicio_contrato,
+                                             fim_contrato,
+                                             id_imovel)
                        values (?, ?, ?, ?, ?, ?, ?, ?)`,
-          [param.endereco, param.locado, param.foto, param.tipo, param.valorAluguel, param.valorCondominio, param.numQuarto, param.numBanheiro],
+          [param.nome, param.cpf, param.data_nascimento, param.renda_mensal, param.vencimento_aluguel, param.inicio_contrato, param.fim_contrato, param.id_imovel],
           (_, {insertId, rows}) => {
             console.log("id insert: " + insertId);
             resolve(insertId)
@@ -40,8 +47,8 @@ export default class ImovelService {
   static updateById(param) {
     return new Promise((resolve, reject) => db.transaction(tx => {
       tx.executeSql(`update ${table}
-                     set endereco = ?, locado = ?, foto = ?, tipo = ?, valorAluguel = ?, valorCondominio = ?, numQuarto = ?, numBanheiro = ?
-                     where id = ?;`, [param.endereco, param.locado, param.foto, param.tipo, param.valorAluguel, param.valorCondominio, param.numQuarto, param.numBanheiro, param.id], () => {
+                     set nome = ?, cpf = ?, data_nascimento = ?, renda_mensal = ?, vencimento_aluguel = ?, inicio_contrato = ?, fim_contrato = ?, id_imovel = ?
+                     where id = ?;`, [param.nome, param.cpf, param.data_nascimento, param.renda_mensal, param.vencimento_aluguel, param.inicio_contrato, param.fim_contrato, param.id_imovel, param.id], () => {
       }), (sqlError) => {
         console.log(sqlError);
       }

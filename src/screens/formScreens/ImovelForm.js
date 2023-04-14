@@ -1,50 +1,32 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {Button, StyleSheet, TextInput, View} from "react-native";
 import {SafeAreaView} from "react-native-safe-area-context";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import ImovelService from "../../services/ImovelService";
+import {Imovel} from "../../models/Imovel";
 
 const ImovelForm = ({navigation}) => {
 
+  const [categoria, setCategoria] = useState(null);
   const [endereco, setEndereco] = useState(null);
   const [locado, setLocado] = useState(false);
   const [foto, setFoto] = useState(null);
   const [tipo, setTipo] = useState(null);
   const [valorAluguel, setValorAluguel] = useState(null);
   const [valorCondominio, setValorCondominio] = useState(null);
-  const [quartos, setQuartos] = useState(null);
-  const [banheiros, setBanheiros] = useState(null);
+  const [numQuarto, setnumQuarto] = useState(null);
+  const [numBanheiro, setnumBanheiro] = useState(null);
 
   const submit = async () => {
-
-    const data = {
-      endereco: endereco,
-      locado: locado,
-      foto: foto,
-      tipo: tipo,
-      valorAluguel: valorAluguel,
-      valorCondominio: valorCondominio,
-      quartos: quartos,
-      banheiros: banheiros
-    }
-
-    await AsyncStorage.getItem("imoveis", (error, result) => {
-
-      const imoveis = JSON.parse(result);
-
-      data.id = imoveis.length + 1
-
-      imoveis.push(data)
-
-      AsyncStorage.setItem("imoveis", JSON.stringify(imoveis))
-
+    const imovel = new Imovel(null, "Nao Locado", categoria, endereco, locado, foto, tipo, valorAluguel, valorCondominio, numQuarto, numBanheiro)
+    await ImovelService.addData(imovel)
+    .then((value) => {
+      console.warn("Imovel inserido com sucesso id: ", value)
       navigation.navigate("Lista de Imoveis")
-    });
+      }).catch((reason) => {
+      console.error("Erro ao inserir imovel, ", reason)
+    })
 
   }
-
-  useEffect(() => {
-    console.log(tipo)
-  }, [tipo])
 
   return (
     <SafeAreaView>
@@ -58,18 +40,26 @@ const ImovelForm = ({navigation}) => {
       </View>
       <View>
         <TextInput
-          placeholder="Quartos"
+          placeholder="numQuarto"
           style={styles.input}
-          onChangeText={(value) => setQuartos(value)}
-          value={quartos}
+          onChangeText={(value) => setnumQuarto(value)}
+          value={numQuarto}
         />
       </View>
       <View>
         <TextInput
-          placeholder="Banheiros"
+          placeholder="Categoria"
           style={styles.input}
-          onChangeText={(value) => setBanheiros(value)}
-          value={banheiros}
+          onChangeText={(value) => setCategoria(value)}
+          value={categoria}
+        />
+      </View>
+      <View>
+        <TextInput
+          placeholder="numBanheiro"
+          style={styles.input}
+          onChangeText={(value) => setnumBanheiro(value)}
+          value={numBanheiro}
         />
       </View>
       <View>

@@ -1,31 +1,36 @@
 import React, {useEffect, useState} from 'react';
 import {Button, FlatList, StatusBar, View, Text, StyleSheet, Image} from "react-native";
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {SafeAreaView} from "react-native-safe-area-context";
+import ImovelService from "../../services/ImovelService";
 
-const ImovelList = ({navigation}) => {
+const ImovelList = ({navigation, route}) => {
 
   const [imoveis, setImoveis] = useState(null)
 
   useEffect(() => {
-    try {
-      AsyncStorage.getItem("imoveis", (error, result) => {
-        console.log(result)
-        setImoveis(JSON.parse(result))
-      });
-
-    } catch (e) {
-      console.error(e)
-    }
-  }, [])
+    const unsubscribe = navigation.addListener('focus',() => {
+      try {
+        ImovelService.findAll().then((values) => {
+          console.warn("Sucesso ao listar os imoveis")
+          setImoveis(values._array)
+        });
+      } catch (e) {
+        console.warn("Falha ao carregar lista de imoveis " + e)
+      }
+    })
+    return unsubscribe;
+  }, [navigation])
 
   const Item = ({item}) => {
     return <View style={styles.item}>
       <Text style={styles.title}>Tipo: {item.tipo}</Text>
-      <Text style={styles.title}>Quartos: {item.quartos}</Text>
-      <Text style={styles.title}>Banheiros: {item.banheiros}</Text>
+      <Text style={styles.title}>Locador: {item.locador}</Text>
+      <Text style={styles.title}>Categoria: {item.categoria}</Text>
+      <Text style={styles.title}>Quartos: {item.numQuarto}</Text>
+      <Text style={styles.title}>Banheiros: {item.numBanheiro}</Text>
       <Text style={styles.title}>Endereço: {item.endereco}</Text>
       <Text style={styles.title}>Valor do Aluguel: {item.valorAluguel}</Text>
+      <Text style={styles.title}>Locado: {item.locado}</Text>
       {item.tipo === "Apartamento" ? <Text style={styles.title}>Valor do Condominio: {item.valorCondominio}</Text> : false}
       <Image
         style={{width: 300, height: 150, margin: 15}}
@@ -33,6 +38,7 @@ const ImovelList = ({navigation}) => {
           uri: item.foto,
         }}
       />
+
     </View>
   };
 
